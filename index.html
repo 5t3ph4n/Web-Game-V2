@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="theme-color" content="#e9eddb"><title>Elsewhere — take the scenic route</title><link rel="stylesheet" href="/src/style.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="theme-color" content="#e9eddb"><title>Elsewhere — take the scenic route</title><link rel="stylesheet" href="./src/style.css"></head>
 <body>
 <canvas id="world" aria-label="An interactive island exploration game"></canvas>
-<header><a class="wordmark" href="/">elsewhere<span>✳</span></a><span class="tagline">NO HURRY. NO WRONG TURNS.</span><nav><button id="sound" title="Toggle ambient sound" aria-label="Enable sound">♫ <span>Sound off</span></button><button id="help" title="Controls">?</button></nav></header>
+<header><a class="wordmark" href="./">elsewhere<span>✳</span></a><span class="tagline">NO HURRY. NO WRONG TURNS.</span><nav><button id="sound" title="Toggle ambient sound" aria-label="Enable sound">♫ <span>Sound off</span></button><button id="help" title="Controls">?</button></nav></header>
 <section class="location"><span class="eyebrow">YOU ARE WANDERING THROUGH</span><h1 id="region">Sunbeam Commons</h1><p id="region-sub">A little beginning. A very big elsewhere.</p></section>
 <div class="time"><span id="sun">☀</span><div><b id="clock">09:00</b><small id="weather">a lovely day to get lost</small></div></div>
 <aside class="discovery"><span class="small-star">✧</span><div><span class="eyebrow">A POCKETFUL OF MOMENTS</span><p><b id="count">0</b><span> / 12 discoveries</span></p></div><button id="journal-open" aria-label="Open discovery journal">↗</button></aside>
@@ -14,5 +14,5 @@
 <div id="welcome" class="welcome"><span class="eyebrow">AN OPEN-WORLD LITTLE ADVENTURE</span><h2>Take the<br>scenic route.</h2><p>Chase fireflies. Make a friend.<br>Find something you weren't looking for.</p><button id="begin">Let’s wander <span>↗</span></button><small>WASD to move · Space to hop · E to say hello</small></div>
 <div id="overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title"><section class="modal"><button id="close" aria-label="Close dialog">×</button><span class="eyebrow" id="modal-label">FIELD NOTES</span><h2 id="modal-title"></h2><div id="modal-content"></div></section></div>
 <div class="touch"><div id="joystick"><div></div></div><button id="touch-jump" aria-label="Jump">↑</button><button id="touch-interact" aria-label="Interact">✧</button></div>
-<script type="module" src="/src/game.js"></script>
+<script type="module" src="./src/game.js"></script>
 </body></html>

@@ -48,3 +48,11 @@ The browser test exercises movement, jumping, bell interaction, journal, map, pe
 - `server.js`: dependency-free static development server.
 
 All visual assets are generated with canvas and all audio is synthesized locally. No third-party game assets are included. Messenger was requested as inspiration, but the reference could not be inspected because its domain was blocked by the cloud network policy; matching its exact mechanics or scale is not claimed.
+
+## GitHub Pages
+
+Play at https://5t3ph4n.github.io/Web-Game-V2/ once the Pages deployment succeeds.
+
+The `Deploy game to GitHub Pages` workflow validates the game and publishes only `index.html` and `src/` on every push to `main`. In repository Settings → Pages, the source must be **GitHub Actions**. You can also run the workflow manually from the Actions tab. No Node server runs on Pages; the browser loads the static game directly.
+
+The browser smoke test accepts `GAME_URL` to validate an alternate URL, including a project subdirectory.

@@ -8,7 +8,7 @@ function cmd(method,params={}){return new Promise((resolve,reject)=>{pending.set
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 async function ev(expression){const r=await cmd('Runtime.evaluate',{expression,returnByValue:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;}
 await cmd('Runtime.enable');await cmd('Page.enable');await cmd('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
-await cmd('Page.navigate',{url:'http://127.0.0.1:3000'});await wait(500);await ev("localStorage.removeItem('elsewhere-v1')");await cmd('Page.reload');await wait(1300);
+await cmd('Page.navigate',{url:process.env.GAME_URL || 'http://127.0.0.1:3000'});await wait(500);await ev("localStorage.removeItem('elsewhere-v1')");await cmd('Page.reload');await wait(1300);
 await writeFile('/tmp/elsewhere-desktop.png',Buffer.from((await cmd('Page.captureScreenshot')).data,'base64'));
 assert.equal(await ev('window.elsewhere.state.landmarks'),12);
 await ev("document.querySelector('#begin').click()");
