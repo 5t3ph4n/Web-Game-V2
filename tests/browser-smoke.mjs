@@ -1,0 +1,33 @@
+import {writeFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const tabs=await (await fetch('http://127.0.0.1:9222/json')).json();
+const ws=new WebSocket(tabs[0].webSocketDebuggerUrl);await new Promise(r=>ws.onopen=r);
+let id=0;const pending=new Map(),errors=[];
+ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id){const p=pending.get(m.id);pending.delete(m.id);m.error?p.reject(m.error):p.resolve(m.result);}if(m.method==='Runtime.exceptionThrown')errors.push(m.params.exceptionDetails);};
+function cmd(method,params={}){return new Promise((resolve,reject)=>{pending.set(++id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));});}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function ev(expression){const r=await cmd('Runtime.evaluate',{expression,returnByValue:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;}
+await cmd('Runtime.enable');await cmd('Page.enable');await cmd('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
+await cmd('Page.navigate',{url:'http://127.0.0.1:3000'});await wait(500);await ev("localStorage.removeItem('elsewhere-v1')");await cmd('Page.reload');await wait(1300);
+await writeFile('/tmp/elsewhere-desktop.png',Buffer.from((await cmd('Page.captureScreenshot')).data,'base64'));
+assert.equal(await ev('window.elsewhere.state.landmarks'),12);
+await ev("document.querySelector('#begin').click()");
+const before=await ev('window.elsewhere.state.player');
+await cmd('Input.dispatchKeyEvent',{type:'keyDown',key:'d',code:'KeyD'});await wait(750);await cmd('Input.dispatchKeyEvent',{type:'keyUp',key:'d',code:'KeyD'});await wait(200);
+const after=await ev('window.elsewhere.state.player');assert.ok(after.x>before.x+1);assert.ok(after.z<before.z-1);
+await cmd('Input.dispatchKeyEvent',{type:'keyDown',key:' ',code:'Space'});await wait(120);assert.ok((await ev('window.elsewhere.state.player')).y>0);await cmd('Input.dispatchKeyEvent',{type:'keyUp',key:' ',code:'Space'});
+assert.equal(await ev("document.querySelector('#prompt').classList.contains('hidden')"),false);
+await cmd('Input.dispatchKeyEvent',{type:'keyDown',key:'e',code:'KeyE'});await cmd('Input.dispatchKeyEvent',{type:'keyUp',key:'e',code:'KeyE'});await wait(300);
+assert.ok((await ev('window.elsewhere.state.discoveries')).includes('bell'));
+await ev("document.querySelector('#journal-open').click()");assert.equal(await ev("document.querySelectorAll('.entry:not(.locked)').length"),1);await ev("document.querySelector('#close').click()");
+await ev("document.querySelector('#map-open').click()");assert.ok(await ev("!!document.querySelector('#bigmap')"));await ev("document.querySelector('#close').click()");
+await writeFile('/tmp/elsewhere-playing.png',Buffer.from((await cmd('Page.captureScreenshot')).data,'base64'));
+await cmd('Page.reload');await wait(900);assert.ok((await ev('window.elsewhere.state.discoveries')).includes('bell'));
+await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await wait(500);await writeFile('/tmp/elsewhere-mobile.png',Buffer.from((await cmd('Page.captureScreenshot')).data,'base64'));
+assert.equal(await ev("getComputedStyle(document.querySelector('.touch')).display"),'flex');
+await ev("document.querySelector('#begin').click()");
+const mobileBefore=await ev('window.elsewhere.state.player');
+await cmd('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:95,y:746}]});await wait(550);await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await wait(100);
+const mobileAfter=await ev('window.elsewhere.state.player');assert.ok(Math.hypot(mobileAfter.x-mobileBefore.x,mobileAfter.z-mobileBefore.z)>1);
+await cmd('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:284,y:746}]});await wait(100);assert.ok((await ev('window.elsewhere.state.player')).y>0);await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+assert.deepEqual(errors,[]);console.log('PASS: page load, movement, jumping, bell interaction, journal, map, persistence, mobile layout, no JavaScript exceptions');ws.close();

@@ -1,0 +1,8 @@
+{
+  "name": "elsewhere-exploration",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "node server.js", "start": "node server.js", "test": "node --test --test-isolation=none tests/*.test.js", "check": "node --check src/game.js && node --check src/world.js && node --check server.js" },
+  "engines": { "node": ">=20" }
+}
