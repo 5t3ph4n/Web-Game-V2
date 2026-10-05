@@ -1,18 +1,67 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="theme-color" content="#e9eddb"><title>Elsewhere — take the scenic route</title><link rel="stylesheet" href="./src/style.css"></head>
-<body>
-<canvas id="world" aria-label="An interactive island exploration game"></canvas>
-<header><a class="wordmark" href="./">elsewhere<span>✳</span></a><span class="tagline">NO HURRY. NO WRONG TURNS.</span><nav><button id="sound" title="Toggle ambient sound" aria-label="Enable sound">♫ <span>Sound off</span></button><button id="help" title="Controls">?</button></nav></header>
-<section class="location"><span class="eyebrow">YOU ARE WANDERING THROUGH</span><h1 id="region">Sunbeam Commons</h1><p id="region-sub">A little beginning. A very big elsewhere.</p></section>
-<div class="time"><span id="sun">☀</span><div><b id="clock">09:00</b><small id="weather">a lovely day to get lost</small></div></div>
-<aside class="discovery"><span class="small-star">✧</span><div><span class="eyebrow">A POCKETFUL OF MOMENTS</span><p><b id="count">0</b><span> / 12 discoveries</span></p></div><button id="journal-open" aria-label="Open discovery journal">↗</button></aside>
-<button class="map-card" id="map-open" aria-label="Open island map"><canvas id="minimap" width="180" height="130"></canvas><span>THE BIG PICTURE <kbd>M</kbd></span></button>
-<div id="prompt" class="hidden"><kbd>E</kbd><span></span></div>
-<div id="toast" role="status"></div>
-<footer><div class="controls"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> wander</span><i></i><span><kbd>SPACE</kbd> hop</span><i></i><span><kbd>SHIFT</kbd> run</span><i></i><span><kbd>E</kbd> interact</span></div><span class="footer-note">follow your curiosity <span>↗</span></span></footer>
-<div id="welcome" class="welcome"><span class="eyebrow">AN OPEN-WORLD LITTLE ADVENTURE</span><h2>Take the<br>scenic route.</h2><p>Chase fireflies. Make a friend.<br>Find something you weren't looking for.</p><button id="begin">Let’s wander <span>↗</span></button><small>WASD to move · Space to hop · E to say hello</small></div>
-<div id="overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title"><section class="modal"><button id="close" aria-label="Close dialog">×</button><span class="eyebrow" id="modal-label">FIELD NOTES</span><h2 id="modal-title"></h2><div id="modal-content"></div></section></div>
-<div class="touch"><div id="joystick"><div></div></div><button id="touch-jump" aria-label="Jump">↑</button><button id="touch-interact" aria-label="Interact">✧</button></div>
-<script type="module" src="./src/game.js"></script>
-</body></html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#dce3ce" />
+    <meta name="description" content="A little farther. A little wonder. Explore a playful, living world at your own pace." />
+    <title>Wanderland — a little world to get lost in</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <canvas id="game" tabindex="0" aria-label="Wanderland, an interactive three-dimensional world"></canvas>
+
+    <header class="top-bar">
+      <div class="brand" aria-label="Wanderland">
+        <svg class="brand-symbol" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 3v6m0 22v6M3 20h6m22 0h6" stroke="currentColor" stroke-width="1.2"/><circle cx="20" cy="20" r="11.5" stroke="currentColor" stroke-width="1.2"/><path d="m25.5 14.5-3 8-8 3 3-8 8-3Z" fill="currentColor"/><path d="m17.5 17.5 5 5" stroke="#f8f6ed" stroke-width="1"/></svg>
+        <div><div class="brand-name">WANDERLAND</div><p class="brand-tagline">A little farther. A little wonder.</p></div>
+      </div>
+      <div class="location-pill"><span class="location-dot"></span><span id="region-name">Willow Village</span><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m6 4 4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <nav class="utility-buttons" aria-label="Game tools">
+        <button id="sound-toggle" class="icon-button" type="button" aria-label="Enable sound" aria-pressed="false" title="Sound"><svg id="sound-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m11 5-6 4H2v6h3l6 4V5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m17 9 5 6m0-6-5 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        <button id="map-open" class="icon-button" type="button" aria-label="Open world map" title="World map (M)"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2V5Zm6-2v16m6-14v16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button id="journal-open" class="icon-button" type="button" aria-label="Open discovery journal" title="Discovery journal (J)"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 3h13a2 2 0 0 1 2 2v16H6a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2ZM7 3v14M3 18a2 2 0 0 1 2-2h15M11 7h5m-5 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button id="settings-open" class="icon-button" type="button" aria-label="Open settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 8.4a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2Z" stroke="currentColor" stroke-width="1.5"/><path d="m9.5 3-.6 2.1-1.7 1-2.1-.5-2.5 4.3 1.5 1.6v2l-1.5 1.6 2.5 4.3 2.1-.5 1.7 1 .6 2.1h5l.6-2.1 1.7-1 2.1.5 2.5-4.3-1.5-1.6v-2l1.5-1.6-2.5-4.3-2.1.5-1.7-1-.6-2.1h-5Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg></button>
+      </nav>
+    </header>
+
+    <section id="welcome" class="welcome-card" aria-label="Welcome to Wanderland">
+      <div class="eyebrow"><span></span>YOUR ONLY PLAN</div>
+      <h1>Get a little<br /><em>lost.</em></h1>
+      <p class="welcome-copy">Follow your curiosity.<br />The world will follow.</p>
+      <button id="begin" class="begin-button" type="button"><span>Let’s wander</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <p class="welcome-footnote">No quests. No hurry.</p>
+    </section>
+
+    <div class="world-caption"><div class="eyebrow" id="area-caption">EXPLORING</div><h2 id="area-name">Willow Village</h2><div class="discovery-line"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m8 1.7 1.7 4.6L14.3 8l-4.6 1.7L8 14.3l-1.7-4.6L1.7 8l4.6-1.7L8 1.7Z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg><span id="discovery-count">0 / 18 discoveries</span></div></div>
+
+    <div class="controls-ribbon" aria-label="Controls">
+      <span class="control-item"><span class="key-group"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span><span>Move</span></span>
+      <span class="control-item"><kbd class="wide-key">Shift</kbd><span>Run</span></span>
+      <span class="control-item"><kbd class="wide-key">Space</kbd><span>Jump</span></span>
+      <span class="control-item"><kbd>E</kbd><span>Interact</span></span>
+      <span class="control-item look-control"><svg viewBox="0 0 18 22" fill="none" aria-hidden="true"><rect x="3" y="2" width="12" height="18" rx="6" stroke="currentColor" stroke-width="1.2"/><path d="M9 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span>Drag to look</span></span>
+    </div>
+
+    <aside class="minimap-panel" aria-label="Nearby world">
+      <div class="minimap-wrap"><span class="minimap-north">N</span><canvas id="minimap" width="300" height="300" aria-label="Mini map showing your current location"></canvas><div class="minimap-pin" aria-hidden="true"></div></div>
+      <button id="map-shortcut" class="map-link" type="button">World map <kbd>M</kbd><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M4 10 10 4M4 4h6v6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </aside>
+
+    <button id="interact-prompt" class="interact-prompt hidden" type="button"><kbd>E</kbd><span id="interact-label">Take a closer look</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 10h10m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+    <div class="mobile-controls">
+      <div id="joystick" class="joystick" aria-label="Move joystick"><div class="joystick-cross" aria-hidden="true"></div><div id="joystick-knob" class="joystick-knob"></div></div>
+      <div class="mobile-actions"><button id="interact-touch" class="touch-button" type="button" aria-label="Interact"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></button><button id="jump-touch" class="touch-button" type="button" aria-label="Jump"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 19V5m-5 5 5-5 5 5M5 21h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    </div>
+
+    <div id="modal" class="modal-backdrop hidden"><section id="modal-card" class="modal-card" role="dialog" aria-modal="true" aria-label="Wanderland" tabindex="-1"><button id="modal-close" class="icon-button modal-close" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button><div id="modal-content"></div></section></div>
+
+    <div id="loading" class="loading-screen" role="status"><div class="loading-inner"><svg class="loading-flower" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M32 32c-17-22 4-35 4-13 22-17 35 4 13 4 17 22-4 35-4 13-22 17-35-4-13-4Z" stroke="currentColor" stroke-width="1.5"/><circle cx="32" cy="32" r="4" fill="currentColor"/></svg><p>Growing a little world…</p><span id="loading-progress">0%</span></div></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

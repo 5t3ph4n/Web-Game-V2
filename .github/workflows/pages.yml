@@ -1,4 +1,4 @@
-name: Deploy game to GitHub Pages
+name: Deploy Wanderland to GitHub Pages
 
 on:
   push:
@@ -15,25 +15,34 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Validate game
+          cache: npm
+      - run: npm ci
+      - name: Validate and build game
         run: |
           npm run check
+          npm run build
+      - name: Install test browser
+        run: npx playwright install --with-deps chromium
+      - name: Check desktop and mobile gameplay
+        run: |
+          npm run preview > /tmp/wanderland-preview.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..40}; do
+            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 0.5
+          done
           npm test
       - uses: actions/configure-pages@v5
-      - name: Prepare static site
-        run: |
-          mkdir _site
-          cp index.html _site/
-          cp -R src _site/src
-          touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: dist
 
   deploy:
     needs: build

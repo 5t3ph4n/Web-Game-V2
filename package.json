@@ -1,8 +1,23 @@
 {
-  "name": "elsewhere-exploration",
+  "name": "wanderland",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "scripts": { "dev": "node server.js", "start": "node server.js", "test": "node --test --test-isolation=none tests/*.test.js", "check": "node --check src/game.js && node --check src/world.js && node --check server.js" },
-  "engines": { "node": ">=20" }
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 3000",
+    "build": "vite build --base=./",
+    "preview": "vite preview --host 0.0.0.0 --port 3000",
+    "check": "node --check src/main.js && node --check src/world.js && node --check src/characters.js",
+    "test": "node tests/browser-smoke.mjs"
+  },
+  "dependencies": {
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0",
+    "vite": "^7.1.12"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
 }
